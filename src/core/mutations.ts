@@ -13,7 +13,7 @@ export function upsertCommand(notes: NotesDocument, command: CommandEntry): Note
   }
 
   return validateNotesDocument({
-    version: 1,
+    version: notes.version,
     commands
   });
 }
@@ -22,7 +22,7 @@ export function deleteCommand(notes: NotesDocument, commandId: string): NotesDoc
   const commands = notes.commands.filter((command) => command.id !== commandId);
 
   return validateNotesDocument({
-    version: 1,
+    version: notes.version,
     commands
   });
 }

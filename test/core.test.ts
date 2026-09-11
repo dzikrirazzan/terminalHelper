@@ -26,7 +26,7 @@ describe("notes store", () => {
   it("validates invalid YAML shape", async () => {
     const configPath = await tempConfigPath();
     await fs.mkdir(path.dirname(configPath), { recursive: true });
-    await fs.writeFile(configPath, "version: 2\ncommands: []\n", "utf8");
+    await fs.writeFile(configPath, "version: 3\ncommands: []\n", "utf8");
 
     await expect(loadNotes(configPath)).rejects.toBeInstanceOf(ConfigError);
   });
@@ -35,8 +35,8 @@ describe("notes store", () => {
     const configPath = await tempConfigPath();
     const initial = await loadNotes(configPath);
     const custom = upsertCommand(initial.notes, {
-      id: "touch",
-      title: "touch",
+      id: "custom-touch",
+      title: "custom touch",
       category: "files",
       summary: "Create an empty file or update a timestamp.",
       syntax: ["touch <file>"],
@@ -51,12 +51,12 @@ describe("notes store", () => {
 
     await saveNotes(custom, configPath);
     const saved = await loadNotes(configPath);
-    expect(filterCommands(saved.notes.commands, "timestamp")[0]?.id).toBe("touch");
+    expect(filterCommands(saved.notes.commands, "timestamp").find((command) => command.id === "custom-touch")?.id).toBe("custom-touch");
 
-    const deleted = deleteCommand(saved.notes, "touch");
+    const deleted = deleteCommand(saved.notes, "custom-touch");
     await saveNotes(deleted, configPath);
     const afterDelete = await loadNotes(configPath);
-    expect(afterDelete.notes.commands.some((command) => command.id === "touch")).toBe(false);
+    expect(afterDelete.notes.commands.some((command) => command.id === "custom-touch")).toBe(false);
   });
 
   it("resets a config file back to defaults", async () => {
@@ -66,6 +66,30 @@ describe("notes store", () => {
     const reset = await resetNotes(configPath);
 
     expect(reset.notes.commands.length).toBe(defaultNotes.commands.length);
+  });
+
+  it("keeps custom notes and adds new built-in commands", async () => {
+    const configPath = await tempConfigPath();
+    const customNotes = {
+      version: 1 as const,
+      commands: [
+        {
+          id: "my-note",
+          title: "my note",
+          category: "custom",
+          summary: "A personal note.",
+          syntax: ["my-command"],
+          examples: [{ command: "my-command", explanation: "Run my command." }],
+          tags: ["custom"]
+        }
+      ]
+    };
+
+    await saveNotes(customNotes, configPath);
+    const loaded = await loadNotes(configPath);
+
+    expect(loaded.notes.commands.some((command) => command.id === "my-note")).toBe(true);
+    expect(loaded.notes.commands.some((command) => command.id === "git-clone")).toBe(true);
   });
 });
 

@@ -4,6 +4,7 @@ import path from "node:path";
 import React from "react";
 import { render } from "ink-testing-library";
 import { describe, expect, it } from "vitest";
+import { defaultNotes } from "../src/core/defaultNotes.js";
 import { loadNotes } from "../src/core/store.js";
 import { TerminalHelpApp } from "../src/tui/TerminalHelpApp.js";
 
@@ -77,13 +78,13 @@ describe("TerminalHelpApp", () => {
     const configPath = await tempConfigPath();
     const app = renderTui(<TerminalHelpApp configPath={configPath} compact />);
 
-    await waitForFrame(app.lastFrame, "Loaded 17 commands.");
+    await waitForFrame(app.lastFrame, `Loaded ${defaultNotes.commands.length} commands.`);
     await writeInput(app, "a");
     await waitForFrame(app.lastFrame, "Add command");
 
     for (const value of [
-      "touch",
-      "touch",
+      "custom-touch",
+      "custom touch",
       "files",
       "Create an empty file.",
       "touch <file>",
@@ -96,14 +97,14 @@ describe("TerminalHelpApp", () => {
       await pressEnter(app);
     }
 
-    await waitForFrame(app.lastFrame, "Added touch");
+    await waitForFrame(app.lastFrame, "Added custom touch");
     let notes = await loadNotes(configPath);
-    expect(notes.notes.commands.some((command) => command.id === "touch")).toBe(true);
+    expect(notes.notes.commands.some((command) => command.id === "custom-touch")).toBe(true);
 
     app.stdin.write("d");
-    await waitForFrame(app.lastFrame, "Deleted touch");
+    await waitForFrame(app.lastFrame, "Deleted custom touch");
     notes = await loadNotes(configPath);
-    expect(notes.notes.commands.some((command) => command.id === "touch")).toBe(false);
+    expect(notes.notes.commands.some((command) => command.id === "custom-touch")).toBe(false);
 
     app.unmount();
   });

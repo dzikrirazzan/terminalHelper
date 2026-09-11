@@ -15,7 +15,7 @@ export type CommandEntry = {
 };
 
 export type NotesDocument = {
-  version: 1;
+  version: 1 | 2;
   commands: CommandEntry[];
 };
 

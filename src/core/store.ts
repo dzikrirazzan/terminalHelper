@@ -25,6 +25,20 @@ export function stringifyNotes(notes: NotesDocument): string {
   });
 }
 
+function migrateNotes(notes: NotesDocument): NotesDocument {
+  if (notes.version === 2) {
+    return notes;
+  }
+
+  const existingIds = new Set(notes.commands.map((command) => command.id));
+  const missingCommands = defaultNotes.commands.filter((command) => !existingIds.has(command.id));
+
+  return {
+    version: 2,
+    commands: [...notes.commands, ...missingCommands]
+  };
+}
+
 export async function ensureNotesFile(configPath?: string): Promise<string> {
   const resolvedPath = resolveConfigPath(configPath);
 
@@ -41,9 +55,11 @@ export async function loadNotes(configPath?: string): Promise<NotesStoreResult> 
   const contents = await fs.readFile(resolvedPath, "utf8");
   const parsed = YAML.parse(contents);
 
+  const notes = migrateNotes(validateNotesDocument(parsed));
+
   return {
     configPath: resolvedPath,
-    notes: validateNotesDocument(parsed)
+    notes
   };
 }
 

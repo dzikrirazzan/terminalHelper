@@ -76,8 +76,8 @@ export function validateNotesDocument(value: unknown): NotesDocument {
     throw new ConfigError("Expected notes file to contain an object.");
   }
 
-  if (value.version !== 1) {
-    throw new ConfigError("Expected notes version to be 1.");
+  if (value.version !== 1 && value.version !== 2) {
+    throw new ConfigError("Expected notes version to be 1 or 2.");
   }
 
   if (!Array.isArray(value.commands)) {
