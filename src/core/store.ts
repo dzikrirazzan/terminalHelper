@@ -1,0 +1,65 @@
+import fs from "node:fs/promises";
+import path from "node:path";
+import YAML from "yaml";
+import { resolveConfigPath } from "./config.js";
+import { defaultNotes } from "./defaultNotes.js";
+import { deleteCommand, upsertCommand } from "./mutations.js";
+import type { NotesDocument, NotesStoreResult } from "./types.js";
+import { validateNotesDocument } from "./validation.js";
+
+export { deleteCommand, upsertCommand };
+
+export async function fileExists(filePath: string): Promise<boolean> {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function stringifyNotes(notes: NotesDocument): string {
+  return YAML.stringify(notes, {
+    lineWidth: 100,
+    singleQuote: false
+  });
+}
+
+export async function ensureNotesFile(configPath?: string): Promise<string> {
+  const resolvedPath = resolveConfigPath(configPath);
+
+  if (!(await fileExists(resolvedPath))) {
+    await fs.mkdir(path.dirname(resolvedPath), { recursive: true });
+    await fs.writeFile(resolvedPath, stringifyNotes(defaultNotes), "utf8");
+  }
+
+  return resolvedPath;
+}
+
+export async function loadNotes(configPath?: string): Promise<NotesStoreResult> {
+  const resolvedPath = await ensureNotesFile(configPath);
+  const contents = await fs.readFile(resolvedPath, "utf8");
+  const parsed = YAML.parse(contents);
+
+  return {
+    configPath: resolvedPath,
+    notes: validateNotesDocument(parsed)
+  };
+}
+
+export async function saveNotes(notes: NotesDocument, configPath?: string): Promise<NotesStoreResult> {
+  const resolvedPath = resolveConfigPath(configPath);
+  const validated = validateNotesDocument(notes);
+
+  await fs.mkdir(path.dirname(resolvedPath), { recursive: true });
+  await fs.writeFile(resolvedPath, stringifyNotes(validated), "utf8");
+
+  return {
+    configPath: resolvedPath,
+    notes: validated
+  };
+}
+
+export async function resetNotes(configPath?: string): Promise<NotesStoreResult> {
+  return saveNotes(defaultNotes, configPath);
+}

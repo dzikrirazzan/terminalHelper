@@ -1,0 +1,48 @@
+{
+  "name": "terminal-help",
+  "version": "0.1.0",
+  "description": "A customizable terminal command helper with TUI, side-window, and split modes.",
+  "type": "module",
+  "bin": {
+    "terminal-help": "./dist/cli/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "dev:window": "npm run build:node && TERMINAL_HELP_RENDERER_URL=http://127.0.0.1:5173 electron dist/electron/main.js",
+    "clean": "node -e \"import('node:fs').then(fs => fs.rmSync('dist', { recursive: true, force: true }))\"",
+    "build": "npm run clean && npm run build:renderer && npm run build:node && chmod +x dist/cli/index.js",
+    "build:node": "tsup",
+    "build:renderer": "vite build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run test && npm run build"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "electron": "^42.4.0",
+    "ink": "^5.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "yaml": "^2.5.1"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.0.0",
+    "@types/node": "^20.14.15",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "ink-testing-library": "^3.0.0",
+    "jsdom": "^24.1.1",
+    "tsup": "^8.2.4",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.0",
+    "vitest": "^2.0.5"
+  }
+}
