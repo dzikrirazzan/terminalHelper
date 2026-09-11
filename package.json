@@ -1,7 +1,7 @@
 {
   "name": "terminal-help",
   "version": "0.1.0",
-  "description": "A customizable terminal command helper with TUI, side-window, and split modes.",
+  "description": "A simple reference for terminal commands with editable notes.",
   "type": "module",
   "bin": {
     "terminal-help": "./dist/cli/index.js"
