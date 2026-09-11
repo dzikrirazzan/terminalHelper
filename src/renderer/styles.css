@@ -99,6 +99,10 @@ textarea {
   background-size: 28px 28px;
 }
 
+.controls-stack {
+  min-width: 0;
+}
+
 .topbar {
   display: flex;
   align-items: center;

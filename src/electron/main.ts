@@ -29,7 +29,7 @@ function createWindow() {
     y: workArea.y + 40,
     title: "terminal-help",
     backgroundColor: "#101318",
-    titleBarStyle: process.platform === "darwin" ? "hiddenInset" : "default",
+    titleBarStyle: "default",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,

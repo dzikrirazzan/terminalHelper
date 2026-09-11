@@ -194,62 +194,64 @@ export function App() {
         </div>
       </header>
 
-      <section className="toolbar" aria-label="Command filters">
-        <label>
-          <span>
-            Find a command <kbd>/</kbd>
-          </span>
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="cd, git, npm..." aria-label="Search commands" />
-        </label>
-        <label>
-          <span>Category</span>
-          <select value={category} onChange={(event) => setCategory(event.target.value)} aria-label="Category">
-            <option value="all">All</option>
-            {categories.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button type="button" onClick={load}>
-          Reload
-        </button>
-        <button
-          type="button"
-          onClick={() =>
-            void api
-              .openConfig()
-              .then((path) => {
-                setError("");
-                setStatus(`Opened ${path}`);
-              })
-              .catch((caughtError) => setError(caughtError instanceof Error ? caughtError.message : String(caughtError)))
-          }
-        >
-          Customize YAML
-        </button>
-        <button type="button" onClick={reset}>
-          Reset
-        </button>
-      </section>
+      <div className="controls-stack">
+        <section className="toolbar" aria-label="Command filters">
+          <label>
+            <span>
+              Find a command <kbd>/</kbd>
+            </span>
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="cd, git, npm..." aria-label="Search commands" />
+          </label>
+          <label>
+            <span>Category</span>
+            <select value={category} onChange={(event) => setCategory(event.target.value)} aria-label="Category">
+              <option value="all">All</option>
+              {categories.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button type="button" onClick={load}>
+            Reload
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              void api
+                .openConfig()
+                .then((path) => {
+                  setError("");
+                  setStatus(`Opened ${path}`);
+                })
+                .catch((caughtError) => setError(caughtError instanceof Error ? caughtError.message : String(caughtError)))
+            }
+          >
+            Customize YAML
+          </button>
+          <button type="button" onClick={reset}>
+            Reset
+          </button>
+        </section>
 
-      {error ? <div className="error">{error}</div> : null}
+        {error ? <div className="error">{error}</div> : null}
 
-      <section className="collection-strip" aria-label="Collection summary">
-        <div>
-          <strong>{notes.commands.length}</strong>
-          <span>commands ready</span>
-        </div>
-        <div>
-          <strong>{categories.length}</strong>
-          <span>topics</span>
-        </div>
-        <div className="collection-tip">
-          <span className="tip-label">START HERE</span>
-          <span>Click a note to see how it works.</span>
-        </div>
-      </section>
+        <section className="collection-strip" aria-label="Collection summary">
+          <div>
+            <strong>{notes.commands.length}</strong>
+            <span>commands ready</span>
+          </div>
+          <div>
+            <strong>{categories.length}</strong>
+            <span>topics</span>
+          </div>
+          <div className="collection-tip">
+            <span className="tip-label">START HERE</span>
+            <span>Click a note to see how it works.</span>
+          </div>
+        </section>
+      </div>
 
       <section className="workspace">
         <nav className="command-list" aria-label="Commands">
