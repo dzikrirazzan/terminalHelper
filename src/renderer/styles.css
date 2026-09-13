@@ -399,6 +399,10 @@ code {
   padding: 16px;
 }
 
+.empty-state p {
+  margin: 0 0 12px;
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -452,6 +456,10 @@ code {
   .topbar {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .topbar-actions {
+    flex-wrap: wrap;
   }
 
   .toolbar {

@@ -35,8 +35,10 @@ export function App() {
   const [form, setForm] = useState<FormState | null>(null);
   const [status, setStatus] = useState("Loading notes...");
   const [error, setError] = useState("");
+  const [isBusy, setIsBusy] = useState(false);
 
   const load = async () => {
+    setIsBusy(true);
     try {
       const result = await api.loadNotes();
       setNotes(result.notes);
@@ -47,6 +49,8 @@ export function App() {
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : String(caughtError));
       setStatus("Could not load notes");
+    } finally {
+      setIsBusy(false);
     }
   };
 
@@ -64,15 +68,20 @@ export function App() {
     }
   }, [filteredCommands, selectedId]);
 
-  const persist = async (nextNotes: NotesDocument, nextStatus: string) => {
+  const persist = async (nextNotes: NotesDocument, nextStatus: string): Promise<boolean> => {
+    setIsBusy(true);
     try {
       const result = await api.saveNotes(nextNotes);
       setNotes(result.notes);
       setConfigPath(result.configPath);
       setStatus(nextStatus);
       setError("");
+      return true;
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : String(caughtError));
+      return false;
+    } finally {
+      setIsBusy(false);
     }
   };
 
@@ -100,7 +109,11 @@ export function App() {
 
     const command = commandFromValues(form.values, form.fallback);
     const nextNotes = upsertCommand(notes, command);
-    await persist(nextNotes, `${form.mode === "add" ? "Added" : "Saved"} ${command.title}`);
+    const saved = await persist(nextNotes, `${form.mode === "add" ? "Added" : "Saved"} ${command.title}`);
+    if (!saved) {
+      return;
+    }
+
     setSelectedId(command.id);
     setForm(null);
   };
@@ -111,11 +124,20 @@ export function App() {
     }
 
     const nextNotes = deleteCommand(notes, selectedCommand.id);
-    await persist(nextNotes, `Deleted ${selectedCommand.title}`);
+    const deleted = await persist(nextNotes, `Deleted ${selectedCommand.title}`);
+    if (!deleted) {
+      return;
+    }
+
     setSelectedId(nextNotes.commands[0]?.id || "");
   };
 
   const reset = async () => {
+    if (!window.confirm("Reset all notes to the built-in beginner commands?")) {
+      return;
+    }
+
+    setIsBusy(true);
     try {
       const result = await api.resetNotes();
       setNotes(result.notes);
@@ -125,6 +147,8 @@ export function App() {
       setError("");
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : String(caughtError));
+    } finally {
+      setIsBusy(false);
     }
   };
 
@@ -156,12 +180,21 @@ export function App() {
 
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
-      if (event.key === "/" && document.activeElement?.tagName !== "INPUT" && document.activeElement?.tagName !== "TEXTAREA") {
+      const isTyping = document.activeElement?.tagName === "INPUT" || document.activeElement?.tagName === "TEXTAREA";
+
+      if (event.key === "/" && !isTyping) {
         event.preventDefault();
         document.querySelector<HTMLInputElement>('input[aria-label="Search commands"]')?.focus();
       }
 
-      if (event.key === "Escape" && document.activeElement?.tagName === "INPUT") {
+      if (event.key.toLowerCase() === "k" && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault();
+        document.querySelector<HTMLInputElement>('input[aria-label="Search commands"]')?.focus();
+      }
+
+      if (event.key === "Escape" && form) {
+        setForm(null);
+      } else if (event.key === "Escape" && isTyping) {
         setQuery("");
         (document.activeElement as HTMLInputElement).blur();
       }
@@ -182,13 +215,13 @@ export function App() {
           <p className="subtitle">Your pocket reference for the command line.</p>
         </div>
         <div className="topbar-actions">
-          <button type="button" className="button-primary" onClick={startAdd}>
+          <button type="button" className="button-primary" onClick={startAdd} disabled={isBusy}>
             + Add note
           </button>
-          <button type="button" onClick={() => selectedCommand && startEdit(selectedCommand)} disabled={!selectedCommand}>
+          <button type="button" onClick={() => selectedCommand && startEdit(selectedCommand)} disabled={!selectedCommand || isBusy}>
             Edit
           </button>
-          <button type="button" onClick={removeSelected} disabled={!selectedCommand}>
+          <button type="button" onClick={() => void removeSelected()} disabled={!selectedCommand || isBusy}>
             Delete
           </button>
         </div>
@@ -213,7 +246,7 @@ export function App() {
               ))}
             </select>
           </label>
-          <button type="button" onClick={load}>
+          <button type="button" onClick={() => void load()} disabled={isBusy}>
             Reload
           </button>
           <button
@@ -230,7 +263,7 @@ export function App() {
           >
             Customize YAML
           </button>
-          <button type="button" onClick={reset}>
+          <button type="button" onClick={() => void reset()} disabled={isBusy}>
             Reset
           </button>
         </section>
@@ -261,7 +294,14 @@ export function App() {
               <span className="command-category">{command.category}</span>
             </button>
           ))}
-          {filteredCommands.length === 0 ? <div className="empty-state">No commands match this search.</div> : null}
+          {filteredCommands.length === 0 ? (
+            <div className="empty-state">
+              <p>No commands match this search.</p>
+              <button type="button" onClick={() => { setQuery(""); setCategory("all"); }}>
+                Clear filters
+              </button>
+            </div>
+          ) : null}
         </nav>
 
         <article className="detail-pane">
@@ -331,10 +371,10 @@ export function App() {
       <footer className="statusbar">{status}</footer>
 
       {form ? (
-        <div className="modal-backdrop" role="presentation">
-          <form className="edit-modal" onSubmit={submitForm}>
+        <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setForm(null)}>
+          <form className="edit-modal" onSubmit={submitForm} role="dialog" aria-modal="true" aria-labelledby="editor-title">
             <div className="modal-head">
-              <h2>{form.mode === "add" ? "Add command" : "Edit command"}</h2>
+              <h2 id="editor-title">{form.mode === "add" ? "Add command" : "Edit command"}</h2>
               <button type="button" onClick={() => setForm(null)} aria-label="Close editor">
                 Close
               </button>
@@ -379,7 +419,7 @@ export function App() {
               <button type="button" onClick={() => setForm(null)}>
                 Cancel
               </button>
-              <button type="submit">Save</button>
+              <button type="submit" disabled={isBusy}>{isBusy ? "Saving..." : "Save"}</button>
             </div>
           </form>
         </div>

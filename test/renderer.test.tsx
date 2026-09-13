@@ -65,6 +65,30 @@ describe("renderer app", () => {
     expect(saved.commands.find((command) => command.id === "cd")?.summary).toBe("Move to another folder.");
   });
 
+  it("keeps the editor open when saving fails", async () => {
+    const notes = cloneNotes(defaultNotes);
+    Object.defineProperty(window, "terminalHelp", {
+      configurable: true,
+      value: {
+        loadNotes: vi.fn(async () => ({ configPath: "/tmp/notes.yaml", notes })),
+        saveNotes: vi.fn(async () => {
+          throw new Error("Disk is full");
+        }),
+        resetNotes: vi.fn(),
+        openConfig: vi.fn(),
+      },
+    });
+
+    render(<App />);
+
+    await screen.findByText("Change the current working directory.");
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+    expect(await screen.findByRole("dialog", { name: "Edit command" })).toBeTruthy();
+    expect(screen.getByText("Disk is full")).toBeTruthy();
+  });
+
   it("copies a syntax command and reports the action", async () => {
     const notes = cloneNotes(defaultNotes);
     const writeText = vi.fn(async () => undefined);

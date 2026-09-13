@@ -73,6 +73,8 @@ terminal-help config open
 
 You can use your own notes file with `--config <path>`.
 
+In the reference window, press `/` or `Ctrl/Cmd+K` to jump to search. Press `Escape` to clear the search or close the editor. Changes are saved when you press **Save**, and a failed save keeps the editor open so you can try again.
+
 ## Terminal controls
 
 - `/`: search
