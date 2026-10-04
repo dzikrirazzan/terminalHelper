@@ -114,4 +114,29 @@ describe("renderer app", () => {
     await waitFor(() => expect(writeText).toHaveBeenCalledWith("cd <path>"));
     expect(screen.getByText("Copied cd <path>")).toBeTruthy();
   });
+
+  it("supports keyboard navigation and closes the editor with Escape", async () => {
+    const notes = cloneNotes(defaultNotes);
+    Object.defineProperty(window, "terminalHelp", {
+      configurable: true,
+      value: {
+        loadNotes: vi.fn(async () => ({ configPath: "/tmp/notes.yaml", notes })),
+        saveNotes: vi.fn(),
+        resetNotes: vi.fn(),
+        openConfig: vi.fn(),
+      },
+    });
+
+    render(<App />);
+
+    await screen.findByText("Change the current working directory.");
+    expect(screen.getByRole("heading", { name: "cd" })).toBeTruthy();
+    fireEvent.keyDown(window, { key: "ArrowDown" });
+    expect(screen.getByRole("heading", { name: "ls" })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    expect(screen.getByRole("dialog", { name: "Edit command" })).toBeTruthy();
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.queryByRole("dialog", { name: "Edit command" })).toBeNull();
+  });
 });

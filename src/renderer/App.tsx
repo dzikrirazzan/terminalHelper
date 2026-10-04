@@ -180,7 +180,18 @@ export function App() {
 
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
-      const isTyping = document.activeElement?.tagName === "INPUT" || document.activeElement?.tagName === "TEXTAREA";
+      const activeTag = document.activeElement?.tagName;
+      const isTyping = activeTag === "INPUT" || activeTag === "TEXTAREA" || activeTag === "SELECT";
+
+      if (event.key === "Escape" && form) {
+        event.preventDefault();
+        setForm(null);
+        return;
+      }
+
+      if (form) {
+        return;
+      }
 
       if (event.key === "/" && !isTyping) {
         event.preventDefault();
@@ -192,17 +203,24 @@ export function App() {
         document.querySelector<HTMLInputElement>('input[aria-label="Search commands"]')?.focus();
       }
 
-      if (event.key === "Escape" && form) {
-        setForm(null);
-      } else if (event.key === "Escape" && isTyping) {
+      if (event.key === "Escape" && isTyping) {
         setQuery("");
         (document.activeElement as HTMLInputElement).blur();
+        return;
+      }
+
+      if (!isTyping && filteredCommands.length > 0 && ["ArrowDown", "ArrowUp", "j", "k"].includes(event.key)) {
+        event.preventDefault();
+        const currentIndex = Math.max(0, filteredCommands.findIndex((command) => command.id === selectedId));
+        const direction = event.key === "ArrowUp" || event.key === "k" ? -1 : 1;
+        const nextIndex = (currentIndex + direction + filteredCommands.length) % filteredCommands.length;
+        setSelectedId(filteredCommands[nextIndex].id);
       }
     };
 
     window.addEventListener("keydown", handleShortcut);
     return () => window.removeEventListener("keydown", handleShortcut);
-  }, []);
+  }, [filteredCommands, form, selectedId]);
 
   return (
     <main className="app-shell">
@@ -215,7 +233,7 @@ export function App() {
           <p className="subtitle">Your pocket reference for the command line.</p>
         </div>
         <div className="topbar-actions">
-          <button type="button" className="button-primary" onClick={startAdd} disabled={isBusy}>
+          <button type="button" className="button-primary" onClick={startAdd} disabled={isBusy} aria-keyshortcuts="a">
             + Add note
           </button>
           <button type="button" onClick={() => selectedCommand && startEdit(selectedCommand)} disabled={!selectedCommand || isBusy}>
@@ -246,7 +264,7 @@ export function App() {
               ))}
             </select>
           </label>
-          <button type="button" onClick={() => void load()} disabled={isBusy}>
+          <button type="button" onClick={() => void load()} disabled={isBusy} aria-keyshortcuts="r">
             Reload
           </button>
           <button
@@ -422,6 +440,7 @@ export function App() {
                   {field.key === "summary" || field.key === "notes" ? (
                     <textarea
                       value={form.values[field.key]}
+                      autoFocus={field.key === "summary"}
                       onChange={(event) =>
                         setForm((current) =>
                           current
@@ -436,6 +455,7 @@ export function App() {
                   ) : (
                     <input
                       value={form.values[field.key]}
+                      autoFocus={field.key === "id"}
                       onChange={(event) =>
                         setForm((current) =>
                           current
