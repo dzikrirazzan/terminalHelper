@@ -47,7 +47,7 @@ function validateExamples(value: unknown, field: string): CommandExample[] {
 
     return {
       command: requireString(item.command, `${field}[${index}].command`),
-      explanation: requireString(item.explanation, `${field}[${index}].explanation`)
+      explanation: requireString(item.explanation, `${field}[${index}].explanation`),
     };
   });
 }
@@ -65,7 +65,7 @@ export function validateCommand(value: unknown, field = "command"): CommandEntry
     syntax: requireStringArray(value.syntax, `${field}.syntax`),
     examples: validateExamples(value.examples, `${field}.examples`),
     tags: Array.isArray(value.tags) ? requireStringArray(value.tags, `${field}.tags`) : [],
-    notes: optionalString(value.notes, `${field}.notes`)
+    notes: optionalString(value.notes, `${field}.notes`),
   };
 
   return command;
@@ -97,6 +97,6 @@ export function validateNotesDocument(value: unknown): NotesDocument {
 
   return {
     version: 1,
-    commands
+    commands,
   };
 }

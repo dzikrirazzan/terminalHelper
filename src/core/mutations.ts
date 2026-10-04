@@ -14,7 +14,7 @@ export function upsertCommand(notes: NotesDocument, command: CommandEntry): Note
 
   return validateNotesDocument({
     version: notes.version,
-    commands
+    commands,
   });
 }
 
@@ -23,6 +23,6 @@ export function deleteCommand(notes: NotesDocument, commandId: string): NotesDoc
 
   return validateNotesDocument({
     version: notes.version,
-    commands
+    commands,
   });
 }

@@ -82,17 +82,7 @@ describe("TerminalHelpApp", () => {
     await writeInput(app, "a");
     await waitForFrame(app.lastFrame, "Add command");
 
-    for (const value of [
-      "custom-touch",
-      "custom touch",
-      "files",
-      "Create an empty file.",
-      "touch <file>",
-      "touch notes.txt",
-      "Create notes.txt.",
-      "files, beginner",
-      "Custom note"
-    ]) {
+    for (const value of ["custom-touch", "custom touch", "files", "Create an empty file.", "touch <file>", "touch notes.txt", "Create notes.txt.", "files, beginner", "Custom note"]) {
       await writeInput(app, value);
       await pressEnter(app);
     }

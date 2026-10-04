@@ -43,10 +43,10 @@ describe("notes store", () => {
       examples: [
         {
           command: "touch notes.txt",
-          explanation: "Create notes.txt if it does not exist."
-        }
+          explanation: "Create notes.txt if it does not exist.",
+        },
       ],
-      tags: ["files", "create"]
+      tags: ["files", "create"],
     });
 
     await saveNotes(custom, configPath);
@@ -80,9 +80,9 @@ describe("notes store", () => {
           summary: "A personal note.",
           syntax: ["my-command"],
           examples: [{ command: "my-command", explanation: "Run my command." }],
-          tags: ["custom"]
-        }
-      ]
+          tags: ["custom"],
+        },
+      ],
     };
 
     await saveNotes(customNotes, configPath);

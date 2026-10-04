@@ -21,7 +21,7 @@ export async function fileExists(filePath: string): Promise<boolean> {
 export function stringifyNotes(notes: NotesDocument): string {
   return YAML.stringify(notes, {
     lineWidth: 100,
-    singleQuote: false
+    singleQuote: false,
   });
 }
 
@@ -35,7 +35,7 @@ function migrateNotes(notes: NotesDocument): NotesDocument {
 
   return {
     version: 2,
-    commands: [...notes.commands, ...missingCommands]
+    commands: [...notes.commands, ...missingCommands],
   };
 }
 
@@ -59,7 +59,7 @@ export async function loadNotes(configPath?: string): Promise<NotesStoreResult> 
 
   return {
     configPath: resolvedPath,
-    notes
+    notes,
   };
 }
 
@@ -72,7 +72,7 @@ export async function saveNotes(notes: NotesDocument, configPath?: string): Prom
 
   return {
     configPath: resolvedPath,
-    notes: validated
+    notes: validated,
   };
 }
 
