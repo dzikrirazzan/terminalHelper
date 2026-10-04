@@ -268,7 +268,14 @@ export function App() {
           </button>
         </section>
 
-        {error ? <div className="error">{error}</div> : null}
+        {error ? (
+          <div className="error" role="alert">
+            <span>{error}</span>
+            <button type="button" onClick={() => void load()} disabled={isBusy}>
+              Try again
+            </button>
+          </div>
+        ) : null}
 
         <section className="collection-strip" aria-label="Collection summary">
           <div>
@@ -278,6 +285,10 @@ export function App() {
           <div>
             <strong>{categories.length}</strong>
             <span>topics</span>
+          </div>
+          <div className="collection-path" title={configPath}>
+            <span>saved in</span>
+            <code>{configPath || "your notes file"}</code>
           </div>
           <div className="collection-tip">
             <span className="tip-label">START HERE</span>
@@ -295,11 +306,29 @@ export function App() {
             </button>
           ))}
           {filteredCommands.length === 0 ? (
-            <div className="empty-state">
-              <p>No commands match this search.</p>
-              <button type="button" onClick={() => { setQuery(""); setCategory("all"); }}>
-                Clear filters
-              </button>
+            <div className="empty-state" role="status">
+              {notes.commands.length === 0 ? (
+                <>
+                  <strong>Your command shelf is empty</strong>
+                  <p>Add your first note, or restore the built-in starter set.</p>
+                  <div className="empty-actions">
+                    <button type="button" className="button-primary" onClick={startAdd} disabled={isBusy}>
+                      Add your first note
+                    </button>
+                    <button type="button" onClick={() => void reset()} disabled={isBusy}>
+                      Restore starters
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <strong>No commands found</strong>
+                  <p>Try a different word or clear the filters.</p>
+                  <button type="button" onClick={() => { setQuery(""); setCategory("all"); }}>
+                    Clear filters
+                  </button>
+                </>
+              )}
             </div>
           ) : null}
         </nav>
@@ -363,12 +392,19 @@ export function App() {
               </div>
             </>
           ) : (
-            <div className="empty-state">Select a command.</div>
+            <div className="detail-empty">
+              <span className="detail-empty-mark">&gt;_</span>
+              <h2>Build your command shelf</h2>
+              <p>Keep the commands you reach for most in one calm, searchable place.</p>
+              <button type="button" className="button-primary" onClick={startAdd} disabled={isBusy}>
+                Add a command
+              </button>
+            </div>
           )}
         </article>
       </section>
 
-      <footer className="statusbar">{status}</footer>
+      <footer className="statusbar" aria-live="polite">{status}</footer>
 
       {form ? (
         <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setForm(null)}>

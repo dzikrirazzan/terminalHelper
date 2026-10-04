@@ -211,6 +211,21 @@ kbd {
   gap: 7px;
 }
 
+.collection-path {
+  min-width: 0;
+}
+
+.collection-path code {
+  max-width: 220px;
+  overflow: hidden;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  padding: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .collection-strip strong {
   color: var(--accent);
   font-size: 18px;
@@ -388,6 +403,10 @@ code {
 }
 
 .error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   border-bottom: 1px solid #44282b;
   background: #2b1418;
   color: #ffb8c0;
@@ -397,6 +416,48 @@ code {
 .empty-state {
   color: var(--muted);
   padding: 16px;
+}
+
+.empty-state strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.detail-empty {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  min-height: 100%;
+  max-width: 440px;
+  padding: 40px 0;
+}
+
+.detail-empty-mark {
+  margin-bottom: 18px;
+  color: var(--accent);
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.detail-empty h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(28px, 4vw, 46px);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.detail-empty p {
+  max-width: 38ch;
+  margin: 16px 0 22px;
 }
 
 .empty-state p {
