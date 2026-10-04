@@ -331,7 +331,13 @@ export function App() {
       <section className="workspace">
         <nav className="command-list" aria-label="Commands">
           {filteredCommands.map((command) => (
-            <button key={command.id} type="button" className={command.id === selectedCommand?.id ? "command-row active" : "command-row"} onClick={() => setSelectedId(command.id)}>
+            <button
+              key={command.id}
+              type="button"
+              className={command.id === selectedCommand?.id ? "command-row active" : "command-row"}
+              aria-current={command.id === selectedCommand?.id ? "true" : undefined}
+              onClick={() => setSelectedId(command.id)}
+            >
               <span className="command-title">{command.title}</span>
               <span className="command-category">{command.category}</span>
             </button>
