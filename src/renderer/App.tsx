@@ -33,6 +33,7 @@ export function App() {
   const [category, setCategory] = useState("all");
   const [selectedId, setSelectedId] = useState("");
   const [form, setForm] = useState<FormState | null>(null);
+  const [formError, setFormError] = useState("");
   const [status, setStatus] = useState("Loading notes...");
   const [error, setError] = useState("");
   const [isBusy, setIsBusy] = useState(false);
@@ -86,6 +87,7 @@ export function App() {
   };
 
   const startAdd = () => {
+    setFormError("");
     setForm({
       mode: "add",
       values: valuesFromCommand(),
@@ -93,6 +95,7 @@ export function App() {
   };
 
   const startEdit = (command: CommandEntry) => {
+    setFormError("");
     setForm({
       mode: "edit",
       values: valuesFromCommand(command),
@@ -108,14 +111,24 @@ export function App() {
     }
 
     const command = commandFromValues(form.values, form.fallback);
-    const nextNotes = upsertCommand(notes, command);
-    const saved = await persist(nextNotes, `${form.mode === "add" ? "Added" : "Saved"} ${command.title}`);
-    if (!saved) {
+    if (form.mode === "add" && notes.commands.some((item) => item.id === command.id)) {
+      setFormError(`A note with the id “${command.id}” already exists. Choose a different id.`);
       return;
     }
 
-    setSelectedId(command.id);
-    setForm(null);
+    try {
+      const nextNotes = upsertCommand(notes, command);
+      const saved = await persist(nextNotes, `${form.mode === "add" ? "Added" : "Saved"} ${command.title}`);
+      if (!saved) {
+        return;
+      }
+
+      setSelectedId(command.id);
+      setForm(null);
+      setFormError("");
+    } catch (caughtError) {
+      setFormError(caughtError instanceof Error ? caughtError.message : String(caughtError));
+    }
   };
 
   const removeSelected = async () => {
@@ -433,6 +446,7 @@ export function App() {
                 Close
               </button>
             </div>
+            {formError ? <div className="form-error" role="alert">{formError}</div> : null}
             <div className="form-grid">
               {formFields.map((field) => (
                 <label key={field.key}>
@@ -444,7 +458,7 @@ export function App() {
                       onChange={(event) =>
                         setForm((current) =>
                           current
-                            ? {
+                              ? {
                                 ...current,
                                 values: createNextValues(current.values, field.key, event.target.value),
                               }

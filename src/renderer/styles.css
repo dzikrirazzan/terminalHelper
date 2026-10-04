@@ -493,6 +493,15 @@ code {
   padding: 14px;
 }
 
+.form-error {
+  border-bottom: 1px solid #684047;
+  background: #32171c;
+  color: #ffc2c9;
+  padding: 10px 14px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

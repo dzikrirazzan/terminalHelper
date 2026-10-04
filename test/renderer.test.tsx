@@ -139,4 +139,28 @@ describe("renderer app", () => {
     fireEvent.keyDown(window, { key: "Escape" });
     expect(screen.queryByRole("dialog", { name: "Edit command" })).toBeNull();
   });
+
+  it("explains duplicate ids before saving a new note", async () => {
+    const notes = cloneNotes(defaultNotes);
+    const saveNotes = vi.fn();
+    Object.defineProperty(window, "terminalHelp", {
+      configurable: true,
+      value: {
+        loadNotes: vi.fn(async () => ({ configPath: "/tmp/notes.yaml", notes })),
+        saveNotes,
+        resetNotes: vi.fn(),
+        openConfig: vi.fn(),
+      },
+    });
+
+    render(<App />);
+
+    await screen.findByText("Change the current working directory.");
+    fireEvent.click(screen.getByRole("button", { name: "+ Add note" }));
+    fireEvent.change(screen.getByLabelText("id"), { target: { value: "cd" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+    expect((await screen.findByRole("alert")).textContent).toContain("already exists");
+    expect(saveNotes).not.toHaveBeenCalled();
+  });
 });
