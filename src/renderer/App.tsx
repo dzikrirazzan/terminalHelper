@@ -11,6 +11,19 @@ type FormState = {
   fallback?: CommandEntry;
 };
 
+type SortMode = "relevance" | "title" | "category";
+
+const FAVORITES_KEY = "terminal-help.favorite-commands";
+
+function readFavorites(): Set<string> {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(FAVORITES_KEY) || "[]");
+    return new Set(Array.isArray(stored) ? stored.filter((value): value is string => typeof value === "string") : []);
+  } catch {
+    return new Set();
+  }
+}
+
 function emptyNotes(): NotesDocument {
   return {
     version: 1,
@@ -31,6 +44,9 @@ export function App() {
   const [configPath, setConfigPath] = useState("");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
+  const [sortMode, setSortMode] = useState<SortMode>("relevance");
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [favorites, setFavorites] = useState<Set<string>>(() => readFavorites());
   const [selectedId, setSelectedId] = useState("");
   const [form, setForm] = useState<FormState | null>(null);
   const [formError, setFormError] = useState("");
@@ -63,7 +79,14 @@ export function App() {
   }, []);
 
   const categories = useMemo(() => getCategories(notes.commands), [notes.commands]);
-  const filteredCommands = useMemo(() => filterCommands(notes.commands, query, category), [category, notes.commands, query]);
+  const filteredCommands = useMemo(() => {
+    const matches = filterCommands(notes.commands, query, category).filter((command) => !favoritesOnly || favorites.has(command.id));
+    return [...matches].sort((left, right) => {
+      if (sortMode === "title") return left.title.localeCompare(right.title);
+      if (sortMode === "category") return `${left.category}-${left.title}`.localeCompare(`${right.category}-${right.title}`);
+      return Number(favorites.has(right.id)) - Number(favorites.has(left.id));
+    });
+  }, [category, favorites, favoritesOnly, notes.commands, query, sortMode]);
   const selectedCommand = filteredCommands.find((command) => command.id === selectedId) ?? filteredCommands[0];
 
   useEffect(() => {
@@ -103,6 +126,16 @@ export function App() {
       mode: "edit",
       values: valuesFromCommand(command),
       fallback: command,
+    });
+  };
+
+  const toggleFavorite = (commandId: string) => {
+    setFavorites((current) => {
+      const next = new Set(current);
+      if (next.has(commandId)) next.delete(commandId);
+      else next.add(commandId);
+      window.localStorage.setItem(FAVORITES_KEY, JSON.stringify([...next]));
+      return next;
     });
   };
 
@@ -209,6 +242,12 @@ export function App() {
         return;
       }
 
+      if (event.key.toLowerCase() === "f" && !isTyping && selectedCommand) {
+        event.preventDefault();
+        toggleFavorite(selectedCommand.id);
+        return;
+      }
+
       if (event.key === "/" && !isTyping) {
         event.preventDefault();
         document.querySelector<HTMLInputElement>('input[aria-label="Search commands"]')?.focus();
@@ -236,7 +275,7 @@ export function App() {
 
     window.addEventListener("keydown", handleShortcut);
     return () => window.removeEventListener("keydown", handleShortcut);
-  }, [filteredCommands, form, selectedId]);
+  }, [filteredCommands, form, selectedCommand, selectedId]);
 
   return (
     <main className="app-shell" aria-busy={isBusy}>
@@ -279,6 +318,18 @@ export function App() {
                 </option>
               ))}
             </select>
+          </label>
+          <label>
+            <span>Sort</span>
+            <select value={sortMode} onChange={(event) => setSortMode(event.target.value as SortMode)} aria-label="Sort commands">
+              <option value="relevance">Favorites first</option>
+              <option value="title">Title A–Z</option>
+              <option value="category">Category</option>
+            </select>
+          </label>
+          <label className="checkbox-label">
+            <input type="checkbox" checked={favoritesOnly} onChange={(event) => setFavoritesOnly(event.target.checked)} aria-label="Show favorites only" />
+            <span>Favorites only</span>
           </label>
           <button type="button" onClick={() => void load()} disabled={isBusy} aria-keyshortcuts="r">
             Reload
@@ -366,7 +417,7 @@ export function App() {
                 <>
                   <strong>No commands found</strong>
                   <p>Try a different word or clear the filters.</p>
-                  <button type="button" onClick={() => { setQuery(""); setCategory("all"); }}>
+                  <button type="button" onClick={() => { setQuery(""); setCategory("all"); setFavoritesOnly(false); }}>
                     Clear filters
                   </button>
                 </>
@@ -386,6 +437,9 @@ export function App() {
                 <div className="detail-meta">
                   <span>{selectedCommand.category}</span>
                   <span>{selectedCommand.tags[0] ?? "note"}</span>
+                  <button type="button" className="favorite-button" onClick={() => toggleFavorite(selectedCommand.id)} aria-pressed={favorites.has(selectedCommand.id)}>
+                    {favorites.has(selectedCommand.id) ? "★ Favorite" : "☆ Favorite"}
+                  </button>
                 </div>
               </div>
 

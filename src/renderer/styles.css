@@ -173,12 +173,24 @@ textarea {
 
 .toolbar {
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) 150px repeat(3, auto);
+  grid-template-columns: minmax(180px, 1fr) 150px 150px auto repeat(3, auto);
   gap: 8px;
   align-items: end;
   padding: 14px 22px;
   border-bottom: 1px solid var(--line);
   background: rgba(16, 22, 26, 0.86);
+}
+
+.checkbox-label {
+  display: flex !important;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+}
+
+.checkbox-label input {
+  width: auto;
+  accent-color: var(--accent);
 }
 
 .toolbar label,
@@ -364,6 +376,11 @@ kbd {
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 7px;
+}
+
+.favorite-button {
+  border-color: #56653d;
+  color: var(--accent);
 }
 
 .detail-pane section {
