@@ -60,6 +60,7 @@ terminal-help split
 terminal-help config path
 terminal-help config open
 terminal-help config reset
+terminal-help config validate
 terminal-help doctor
 ```
 
@@ -74,6 +75,10 @@ terminal-help config open
 You can use your own notes file with `--config <path>`.
 
 In the reference window, press `/` or `Ctrl/Cmd+K` to jump to search. Press `Escape` to clear the search or close the editor. Changes are saved when you press **Save**, and a failed save keeps the editor open so you can try again.
+
+Use the **Favorite** button to keep high-value commands at the top of the list. The favorite state is stored locally on this computer; **Favorites only** filters the list, and **Sort** can switch between favorites, title, and category order. Press `f` while browsing to toggle the selected command.
+
+Run `terminal-help config validate` in scripts or before sharing a notes file to confirm that the YAML is readable and report how many commands it contains.
 
 ## Terminal controls
 

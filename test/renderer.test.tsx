@@ -163,4 +163,26 @@ describe("renderer app", () => {
     expect((await screen.findByRole("alert")).textContent).toContain("already exists");
     expect(saveNotes).not.toHaveBeenCalled();
   });
+
+  it("persists favorites and can filter to them", async () => {
+    const notes = cloneNotes(defaultNotes);
+    Object.defineProperty(window, "terminalHelp", {
+      configurable: true,
+      value: {
+        loadNotes: vi.fn(async () => ({ configPath: "/tmp/notes.yaml", notes })),
+        saveNotes: vi.fn(),
+        resetNotes: vi.fn(),
+        openConfig: vi.fn(),
+      },
+    });
+
+    render(<App />);
+    await screen.findByText("Change the current working directory.");
+    fireEvent.click(screen.getByRole("button", { name: "☆ Favorite" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Show favorites only" }));
+
+    expect(screen.getByRole("button", { name: "cd navigation" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /git status/i })).toBeNull();
+    expect(screen.getByRole("button", { name: "★ Favorite" })).toBeTruthy();
+  });
 });

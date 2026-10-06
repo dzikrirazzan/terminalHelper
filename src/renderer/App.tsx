@@ -17,7 +17,7 @@ const FAVORITES_KEY = "terminal-help.favorite-commands";
 
 function readFavorites(): Set<string> {
   try {
-    const stored = JSON.parse(window.localStorage.getItem(FAVORITES_KEY) || "[]");
+    const stored = JSON.parse(typeof window.localStorage?.getItem === "function" ? window.localStorage.getItem(FAVORITES_KEY) || "[]" : "[]");
     return new Set(Array.isArray(stored) ? stored.filter((value): value is string => typeof value === "string") : []);
   } catch {
     return new Set();
@@ -135,7 +135,11 @@ export function App() {
       const next = new Set(current);
       if (next.has(commandId)) next.delete(commandId);
       else next.add(commandId);
-      window.localStorage.setItem(FAVORITES_KEY, JSON.stringify([...next]));
+      try {
+        window.localStorage?.setItem?.(FAVORITES_KEY, JSON.stringify([...next]));
+      } catch {
+        // Preview and privacy-restricted browsers can disable local storage.
+      }
       return next;
     });
   };
