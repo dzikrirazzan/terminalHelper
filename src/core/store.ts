@@ -68,7 +68,14 @@ export async function saveNotes(notes: NotesDocument, configPath?: string): Prom
   const validated = validateNotesDocument(notes);
 
   await fs.mkdir(path.dirname(resolvedPath), { recursive: true });
-  await fs.writeFile(resolvedPath, stringifyNotes(validated), "utf8");
+  const temporaryPath = `${resolvedPath}.${process.pid}.${Date.now()}.tmp`;
+
+  try {
+    await fs.writeFile(temporaryPath, stringifyNotes(validated), { encoding: "utf8", mode: 0o600 });
+    await fs.rename(temporaryPath, resolvedPath);
+  } finally {
+    await fs.rm(temporaryPath, { force: true });
+  }
 
   return {
     configPath: resolvedPath,

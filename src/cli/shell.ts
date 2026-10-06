@@ -5,10 +5,9 @@ export function shellQuote(value: string): string {
 }
 
 export function hasExecutable(name: string): boolean {
-  const result =
-    process.platform === "win32"
-      ? spawnSync("where", [name], { stdio: "ignore" })
-      : spawnSync("sh", ["-c", `command -v ${name}`], { stdio: "ignore" });
+  const result = process.platform === "win32"
+    ? spawnSync("where", [name], { stdio: "ignore" })
+    : spawnSync("command", ["-v", name], { stdio: "ignore" });
 
   return result.status === 0;
 }

@@ -4,10 +4,9 @@ import { fileExists, loadNotes } from "./store.js";
 import type { DoctorReport } from "./types.js";
 
 export function hasCommand(command: string): boolean {
-  const result =
-    process.platform === "win32"
-      ? spawnSync("where", [command], { stdio: "ignore" })
-      : spawnSync("sh", ["-c", `command -v ${command}`], { stdio: "ignore" });
+  const result = process.platform === "win32"
+    ? spawnSync("where", [command], { stdio: "ignore" })
+    : spawnSync("command", ["-v", command], { stdio: "ignore" });
 
   return result.status === 0;
 }
