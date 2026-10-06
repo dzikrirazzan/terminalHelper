@@ -37,6 +37,7 @@ export function App() {
   const [status, setStatus] = useState("Loading notes...");
   const [error, setError] = useState("");
   const [isBusy, setIsBusy] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const load = async () => {
     setIsBusy(true);
@@ -47,9 +48,11 @@ export function App() {
       setSelectedId((current) => current || result.notes.commands[0]?.id || "");
       setStatus(`Loaded ${result.notes.commands.length} commands`);
       setError("");
+      setIsLoaded(true);
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : String(caughtError));
       setStatus("Could not load notes");
+      setIsLoaded(true);
     } finally {
       setIsBusy(false);
     }
@@ -61,7 +64,7 @@ export function App() {
 
   const categories = useMemo(() => getCategories(notes.commands), [notes.commands]);
   const filteredCommands = useMemo(() => filterCommands(notes.commands, query, category), [category, notes.commands, query]);
-  const selectedCommand = filteredCommands.find((command) => command.id === selectedId) ?? filteredCommands[0] ?? notes.commands[0];
+  const selectedCommand = filteredCommands.find((command) => command.id === selectedId) ?? filteredCommands[0];
 
   useEffect(() => {
     if (filteredCommands.length > 0 && !filteredCommands.some((command) => command.id === selectedId)) {
@@ -236,7 +239,7 @@ export function App() {
   }, [filteredCommands, form, selectedId]);
 
   return (
-    <main className="app-shell">
+    <main className="app-shell" aria-busy={isBusy}>
       <header className="topbar">
         <div>
           <div className="brand-line">
@@ -264,7 +267,7 @@ export function App() {
             <span>
               Find a command <kbd>/</kbd>
             </span>
-            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="cd, git, npm..." aria-label="Search commands" />
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="cd, git, npm..." aria-label="Search commands" autoComplete="off" />
           </label>
           <label>
             <span>Category</span>
@@ -328,9 +331,11 @@ export function App() {
         </section>
       </div>
 
-      <section className="workspace">
+      {!isLoaded && !error ? <div className="loading-state" role="status">Loading your command shelf…</div> : null}
+
+      <section className="workspace" aria-label="Command workspace">
         <nav className="command-list" aria-label="Commands">
-          {filteredCommands.map((command) => (
+          {isLoaded ? filteredCommands.map((command) => (
             <button
               key={command.id}
               type="button"
@@ -341,8 +346,8 @@ export function App() {
               <span className="command-title">{command.title}</span>
               <span className="command-category">{command.category}</span>
             </button>
-          ))}
-          {filteredCommands.length === 0 ? (
+          )) : null}
+          {isLoaded && filteredCommands.length === 0 ? (
             <div className="empty-state" role="status">
               {notes.commands.length === 0 ? (
                 <>

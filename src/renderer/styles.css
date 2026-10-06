@@ -263,6 +263,16 @@ kbd {
   min-height: 0;
 }
 
+.loading-state {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
 .command-list {
   min-height: 0;
   overflow-y: auto;
