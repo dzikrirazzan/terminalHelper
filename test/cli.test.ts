@@ -1,4 +1,5 @@
 import path from "node:path";
+import os from "node:os";
 import { describe, expect, it, vi } from "vitest";
 import { createProgram } from "../src/cli/program.js";
 
@@ -33,6 +34,19 @@ describe("CLI", () => {
     });
 
     expect(log).toHaveBeenCalledWith(path.resolve(configPath));
+    log.mockRestore();
+  });
+
+  it("validates a notes file", async () => {
+    let output = "";
+    const log = vi.spyOn(console, "log").mockImplementation((value) => {
+      output += String(value);
+    });
+    const configPath = path.join(os.tmpdir(), "terminal-help-cli-validate-notes.yaml");
+
+    await createProgram().parseAsync(["node", "terminal-help", "config", "validate", "--config", configPath], { from: "node" });
+
+    expect(output).toContain("Valid");
     log.mockRestore();
   });
 });

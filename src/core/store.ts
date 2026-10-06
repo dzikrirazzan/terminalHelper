@@ -44,7 +44,7 @@ export async function ensureNotesFile(configPath?: string): Promise<string> {
 
   if (!(await fileExists(resolvedPath))) {
     await fs.mkdir(path.dirname(resolvedPath), { recursive: true });
-    await fs.writeFile(resolvedPath, stringifyNotes(defaultNotes), "utf8");
+    await fs.writeFile(resolvedPath, stringifyNotes(defaultNotes), { encoding: "utf8", mode: 0o600 });
   }
 
   return resolvedPath;

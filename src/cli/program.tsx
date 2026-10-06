@@ -3,7 +3,7 @@ import { Command } from "commander";
 import { render } from "ink";
 import { getDoctorReport } from "../core/doctor.js";
 import { resolveConfigPath } from "../core/config.js";
-import { ensureNotesFile, resetNotes } from "../core/store.js";
+import { ensureNotesFile, loadNotes, resetNotes } from "../core/store.js";
 import { openConfigFile } from "../core/openFile.js";
 import { TerminalHelpApp } from "../tui/TerminalHelpApp.js";
 import { launchSplit } from "./split.js";
@@ -94,6 +94,20 @@ export function createProgram(): Command {
       console.log(`Reset ${result.configPath}`);
     });
 
+  configCommand
+    .command("validate")
+    .description("Validate the notes YAML file and report its command count.")
+    .option("--config <path>", "Use a custom notes YAML file.")
+    .action(async (options: RunTuiOptions, command: Command) => {
+      try {
+        const result = await loadNotes(readConfigOption(options, command));
+        console.log(`Valid ${result.configPath} (${result.notes.commands.length} commands)`);
+      } catch (caughtError) {
+        console.error(caughtError instanceof Error ? caughtError.message : String(caughtError));
+        process.exitCode = 1;
+      }
+    });
+
   program
     .command("doctor")
     .description("Check terminal-help configuration and integration support.")
@@ -111,6 +125,7 @@ export function createProgram(): Command {
 
       if (report.error) {
         console.log(`error: ${report.error}`);
+        process.exitCode = 1;
       }
     });
 
