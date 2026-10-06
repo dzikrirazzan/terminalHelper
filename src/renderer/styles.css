@@ -531,6 +531,11 @@ code {
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
 }
 
+.edit-modal:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
 .modal-head {
   display: flex;
   align-items: center;
@@ -609,6 +614,16 @@ code {
 
   .form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .modal-backdrop {
+    align-items: end;
+    padding: 0;
+  }
+
+  .edit-modal {
+    max-height: 94vh;
+    border-radius: 10px 10px 0 0;
   }
 
   .form-grid label:nth-child(4),

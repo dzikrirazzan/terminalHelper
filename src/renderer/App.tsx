@@ -54,6 +54,7 @@ export function App() {
   const [error, setError] = useState("");
   const [isBusy, setIsBusy] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [copiedCommand, setCopiedCommand] = useState("");
 
   const load = async () => {
     setIsBusy(true);
@@ -222,6 +223,8 @@ export function App() {
 
       setError("");
       setStatus(`Copied ${command}`);
+      setCopiedCommand(command);
+      window.setTimeout(() => setCopiedCommand((current) => current === command ? "" : current), 1400);
     } catch {
       setError("Could not copy this command. Select it manually instead.");
     }
@@ -449,8 +452,8 @@ export function App() {
                   {selectedCommand.syntax.map((syntax) => (
                     <div className="code-row" key={syntax}>
                       <code>$ {syntax}</code>
-                      <button type="button" className="copy-button" onClick={() => void copyCommand(syntax)} aria-label={`Copy ${syntax}`}>
-                        Copy
+                        <button type="button" className="copy-button" onClick={() => void copyCommand(syntax)} aria-label={`Copy ${syntax}`}>
+                          {copiedCommand === syntax ? "Copied" : "Copy"}
                       </button>
                     </div>
                   ))}
@@ -465,7 +468,7 @@ export function App() {
                       <div className="code-row">
                         <code>$ {example.command}</code>
                         <button type="button" className="copy-button" onClick={() => void copyCommand(example.command)} aria-label={`Copy ${example.command}`}>
-                          Copy
+                          {copiedCommand === example.command ? "Copied" : "Copy"}
                         </button>
                       </div>
                       <p>{example.explanation}</p>
@@ -534,7 +537,7 @@ export function App() {
                   ) : (
                     <input
                       value={form.values[field.key]}
-                      autoFocus={field.key === "id"}
+                      autoFocus={field.key === (form.mode === "add" ? "id" : "title")}
                       onChange={(event) =>
                         setForm((current) =>
                           current
