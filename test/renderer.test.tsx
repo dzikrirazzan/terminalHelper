@@ -32,10 +32,12 @@ describe("renderer app", () => {
     render(<App />);
 
     expect(await screen.findByText("Change the current working directory.")).toBeTruthy();
+    expect(screen.getByText("matches")).toBeTruthy();
     fireEvent.change(screen.getByLabelText("Search commands"), { target: { value: "npm" } });
 
     expect(screen.getByRole("button", { name: /npm install/i })).toBeTruthy();
     expect(screen.queryByRole("button", { name: /git status/i })).toBeNull();
+    expect(screen.getByText("matches")).toBeTruthy();
   });
 
   it("persists edits through the Electron bridge", async () => {

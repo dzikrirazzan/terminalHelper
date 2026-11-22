@@ -378,6 +378,10 @@ export function App() {
             <strong>{categories.length}</strong>
             <span>topics</span>
           </div>
+          <div>
+            <strong>{filteredCommands.length}</strong>
+            <span>{filteredCommands.length === 1 ? "match" : "matches"}</span>
+          </div>
           <div className="collection-path" title={configPath}>
             <span>saved in</span>
             <code>{configPath || "your notes file"}</code>
