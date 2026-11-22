@@ -115,6 +115,27 @@ describe("doctor checks", () => {
   });
 });
 
+describe("config normalization", () => {
+  it("trims whitespace around validated strings", async () => {
+    const configPath = await tempConfigPath();
+    const notes = await saveNotes({
+      version: 2,
+      commands: [{
+        id: "  custom  ",
+        title: "  custom command  ",
+        category: "  tools  ",
+        summary: "  A useful note.  ",
+        syntax: ["  custom  "],
+        examples: [{ command: "  custom  ", explanation: "  Run it.  " }],
+        tags: ["  tool  "],
+      }],
+    }, configPath);
+
+    expect(notes.notes.commands[0]).toMatchObject({ id: "custom", title: "custom command", category: "tools", summary: "A useful note." });
+    expect(notes.notes.commands[0].tags).toEqual(["tool"]);
+  });
+});
+
 describe("command search", () => {
   it("matches every term in a multi-word query", () => {
     const matches = filterCommands(defaultNotes.commands, "working directory");

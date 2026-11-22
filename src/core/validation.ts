@@ -16,7 +16,7 @@ function requireString(value: unknown, field: string): string {
     throw new ConfigError(`Expected ${field} to be a non-empty string.`);
   }
 
-  return value;
+  return value.trim();
 }
 
 function optionalString(value: unknown, field: string): string | undefined {
