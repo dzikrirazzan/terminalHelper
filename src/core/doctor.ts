@@ -6,7 +6,7 @@ import type { DoctorReport } from "./types.js";
 export function hasCommand(command: string): boolean {
   const result = process.platform === "win32"
     ? spawnSync("where", [command], { stdio: "ignore" })
-    : spawnSync("command", ["-v", command], { stdio: "ignore" });
+    : spawnSync("which", [command], { stdio: "ignore" });
 
   return result.status === 0;
 }

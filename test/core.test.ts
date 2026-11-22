@@ -3,6 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { resolveConfigPath } from "../src/core/config.js";
+import { hasCommand } from "../src/core/doctor.js";
 import { defaultNotes } from "../src/core/defaultNotes.js";
 import { filterCommands } from "../src/core/search.js";
 import { deleteCommand, loadNotes, resetNotes, saveNotes, upsertCommand } from "../src/core/store.js";
@@ -105,6 +106,12 @@ describe("notes store", () => {
 describe("config paths", () => {
   it("expands custom config paths", () => {
     expect(resolveConfigPath("~/terminal-help-test.yaml")).toContain(path.join(os.homedir(), "terminal-help-test.yaml"));
+  });
+});
+
+describe("doctor checks", () => {
+  it("finds executables available on the current path", () => {
+    expect(hasCommand("node")).toBe(true);
   });
 });
 
