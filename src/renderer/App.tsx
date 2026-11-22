@@ -249,6 +249,24 @@ export function App() {
         return;
       }
 
+      if (event.key.toLowerCase() === "a" && !isTyping) {
+        event.preventDefault();
+        startAdd();
+        return;
+      }
+
+      if (event.key.toLowerCase() === "e" && !isTyping && selectedCommand) {
+        event.preventDefault();
+        startEdit(selectedCommand);
+        return;
+      }
+
+      if (event.key.toLowerCase() === "r" && !isTyping) {
+        event.preventDefault();
+        void load();
+        return;
+      }
+
       if (event.key.toLowerCase() === "f" && !isTyping && selectedCommand) {
         event.preventDefault();
         toggleFavorite(selectedCommand.id);

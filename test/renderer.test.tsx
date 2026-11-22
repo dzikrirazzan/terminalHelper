@@ -158,6 +158,20 @@ describe("renderer app", () => {
     expect(screen.queryByRole("dialog", { name: "Edit command" })).toBeNull();
   });
 
+  it("opens the add editor with the documented keyboard shortcut", async () => {
+    const notes = cloneNotes(defaultNotes);
+    Object.defineProperty(window, "terminalHelp", {
+      configurable: true,
+      value: { loadNotes: vi.fn(async () => ({ configPath: "/tmp/notes.yaml", notes })), saveNotes: vi.fn(), resetNotes: vi.fn(), openConfig: vi.fn() },
+    });
+
+    render(<App />);
+    await screen.findByText("Change the current working directory.");
+    fireEvent.keyDown(window, { key: "a" });
+
+    expect(screen.getByRole("dialog", { name: "Add command" })).toBeTruthy();
+  });
+
   it("explains duplicate ids before saving a new note", async () => {
     const notes = cloneNotes(defaultNotes);
     const saveNotes = vi.fn();
