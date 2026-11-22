@@ -196,6 +196,23 @@ describe("renderer app", () => {
     expect(saveNotes).not.toHaveBeenCalled();
   });
 
+  it("asks for confirmation before deleting a command", async () => {
+    const notes = cloneNotes(defaultNotes);
+    const saveNotes = vi.fn(async (nextNotes: NotesDocument) => ({ configPath: "/tmp/notes.yaml", notes: nextNotes }));
+    vi.spyOn(window, "confirm").mockReturnValue(false);
+    Object.defineProperty(window, "terminalHelp", {
+      configurable: true,
+      value: { loadNotes: vi.fn(async () => ({ configPath: "/tmp/notes.yaml", notes })), saveNotes, resetNotes: vi.fn(), openConfig: vi.fn() },
+    });
+
+    render(<App />);
+    await screen.findByText("Change the current working directory.");
+    fireEvent.click(screen.getByRole("button", { name: "Delete" }));
+
+    expect(window.confirm).toHaveBeenCalledWith("Delete the “cd” note?");
+    expect(saveNotes).not.toHaveBeenCalled();
+  });
+
   it("persists favorites and can filter to them", async () => {
     const notes = cloneNotes(defaultNotes);
     Object.defineProperty(window, "terminalHelp", {

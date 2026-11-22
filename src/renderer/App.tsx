@@ -177,6 +177,10 @@ export function App() {
       return;
     }
 
+    if (!window.confirm(`Delete the “${selectedCommand.title}” note?`)) {
+      return;
+    }
+
     const nextNotes = deleteCommand(notes, selectedCommand.id);
     const deleted = await persist(nextNotes, `Deleted ${selectedCommand.title}`);
     if (!deleted) {
