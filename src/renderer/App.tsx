@@ -455,7 +455,12 @@ export function App() {
               </div>
 
               <section>
-                <h3>Syntax</h3>
+                <div className="section-heading">
+                  <h3>Syntax</h3>
+                  <button type="button" className="copy-button" onClick={() => void copyCommand(selectedCommand.syntax.join("\n"))}>
+                    Copy all
+                  </button>
+                </div>
                 <div className="code-list">
                   {selectedCommand.syntax.map((syntax) => (
                     <div className="code-row" key={syntax}>

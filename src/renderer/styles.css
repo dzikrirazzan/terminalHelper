@@ -387,6 +387,17 @@ kbd {
   margin-top: 18px;
 }
 
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.section-heading h3 {
+  margin-bottom: 0;
+}
+
 .detail-pane h3 {
   margin: 0 0 10px;
   color: var(--warm);

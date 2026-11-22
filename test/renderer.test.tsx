@@ -117,6 +117,22 @@ describe("renderer app", () => {
     expect(screen.getByText("Copied cd <path>")).toBeTruthy();
   });
 
+  it("copies all syntax lines together", async () => {
+    const notes = cloneNotes(defaultNotes);
+    const writeText = vi.fn(async () => undefined);
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
+    Object.defineProperty(window, "terminalHelp", {
+      configurable: true,
+      value: { loadNotes: vi.fn(async () => ({ configPath: "/tmp/notes.yaml", notes })), saveNotes: vi.fn(), resetNotes: vi.fn(), openConfig: vi.fn() },
+    });
+
+    render(<App />);
+    await screen.findByText("Change the current working directory.");
+    fireEvent.click(screen.getByRole("button", { name: "Copy all" }));
+
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith(notes.commands[0].syntax.join("\n")));
+  });
+
   it("supports keyboard navigation and closes the editor with Escape", async () => {
     const notes = cloneNotes(defaultNotes);
     Object.defineProperty(window, "terminalHelp", {
