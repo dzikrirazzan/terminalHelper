@@ -14,6 +14,15 @@ async function tempConfigPath() {
 }
 
 describe("notes store", () => {
+  it("preserves version 2 documents when loading them", async () => {
+    const configPath = await tempConfigPath();
+    await saveNotes({ version: 2, commands: defaultNotes.commands }, configPath);
+
+    const loaded = await loadNotes(configPath);
+
+    expect(loaded.notes.version).toBe(2);
+  });
+
   it("seeds a missing config file with beginner commands", async () => {
     const configPath = await tempConfigPath();
     const result = await loadNotes(configPath);

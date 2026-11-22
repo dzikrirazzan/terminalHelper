@@ -96,7 +96,7 @@ export function validateNotesDocument(value: unknown): NotesDocument {
   }
 
   return {
-    version: 1,
+    version: value.version,
     commands,
   };
 }
