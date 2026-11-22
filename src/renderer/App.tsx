@@ -271,6 +271,12 @@ export function App() {
         return;
       }
 
+      if (event.key.toLowerCase() === "d" && !isTyping && selectedCommand) {
+        event.preventDefault();
+        void removeSelected();
+        return;
+      }
+
       if (event.key.toLowerCase() === "f" && !isTyping && selectedCommand) {
         event.preventDefault();
         toggleFavorite(selectedCommand.id);
