@@ -6,6 +6,7 @@ export function getCategories(commands: CommandEntry[]): string[] {
 
 export function filterCommands(commands: CommandEntry[], query: string, category = "all"): CommandEntry[] {
   const normalizedQuery = query.trim().toLowerCase();
+  const queryTerms = normalizedQuery.split(/\s+/).filter(Boolean);
 
   return commands.filter((command) => {
     const matchesCategory = category === "all" || command.category === category;
@@ -22,6 +23,6 @@ export function filterCommands(commands: CommandEntry[], query: string, category
       .join(" ")
       .toLowerCase();
 
-    return matchesCategory && (!normalizedQuery || searchable.includes(normalizedQuery));
+    return matchesCategory && queryTerms.every((term) => searchable.includes(term));
   });
 }

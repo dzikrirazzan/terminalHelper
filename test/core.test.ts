@@ -107,3 +107,12 @@ describe("config paths", () => {
     expect(resolveConfigPath("~/terminal-help-test.yaml")).toContain(path.join(os.homedir(), "terminal-help-test.yaml"));
   });
 });
+
+describe("command search", () => {
+  it("matches every term in a multi-word query", () => {
+    const matches = filterCommands(defaultNotes.commands, "working directory");
+
+    expect(matches.some((command) => command.id === "cd")).toBe(true);
+    expect(filterCommands(defaultNotes.commands, "working missing")).toHaveLength(0);
+  });
+});
