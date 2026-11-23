@@ -498,7 +498,7 @@ export function App() {
                 <div className="section-heading">
                   <h3>Syntax</h3>
                   <button type="button" className="copy-button" onClick={() => void copyCommand(selectedCommand.syntax.join("\n"))}>
-                    Copy all
+                    {copiedCommand === selectedCommand.syntax.join("\n") ? "Copied" : "Copy all"}
                   </button>
                 </div>
                 <div className="code-list">
