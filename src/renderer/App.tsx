@@ -91,6 +91,13 @@ export function App() {
     });
   }, [category, favorites, favoritesOnly, notes.commands, query, sortMode]);
   const selectedCommand = filteredCommands.find((command) => command.id === selectedId) ?? filteredCommands[0];
+  const hasActiveFilters = Boolean(query.trim()) || category !== "all" || favoritesOnly;
+
+  const clearFilters = () => {
+    setQuery("");
+    setCategory("all");
+    setFavoritesOnly(false);
+  };
 
   useEffect(() => {
     if (filteredCommands.length > 0 && !filteredCommands.some((command) => command.id === selectedId)) {
@@ -388,6 +395,9 @@ export function App() {
           <button type="button" onClick={() => void reset()} disabled={isBusy}>
             Reset
           </button>
+          <button type="button" onClick={clearFilters} disabled={!hasActiveFilters}>
+            Clear filters
+          </button>
         </section>
 
         {error ? (
@@ -458,7 +468,7 @@ export function App() {
                 <>
                   <strong>No commands found</strong>
                   <p>Try a different word or clear the filters.</p>
-                  <button type="button" onClick={() => { setQuery(""); setCategory("all"); setFavoritesOnly(false); }}>
+                  <button type="button" onClick={clearFilters}>
                     Clear filters
                   </button>
                 </>
