@@ -108,6 +108,17 @@ export function createProgram(): Command {
       }
     });
 
+  configCommand
+    .command("list")
+    .description("List command ids and titles from the notes YAML file.")
+    .option("--config <path>", "Use a custom notes YAML file.")
+    .action(async (options: RunTuiOptions, command: Command) => {
+      const result = await loadNotes(readConfigOption(options, command));
+      for (const note of result.notes.commands) {
+        console.log(`${note.id}\t${note.title}`);
+      }
+    });
+
   program
     .command("doctor")
     .description("Check terminal-help configuration and integration support.")

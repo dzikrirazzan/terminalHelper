@@ -49,4 +49,17 @@ describe("CLI", () => {
     expect(output).toContain("Valid");
     log.mockRestore();
   });
+
+  it("lists command ids and titles", async () => {
+    let output = "";
+    const log = vi.spyOn(console, "log").mockImplementation((value) => {
+      output += `${String(value)}\n`;
+    });
+    const configPath = path.join(os.tmpdir(), "terminal-help-cli-list-notes.yaml");
+
+    await createProgram().parseAsync(["node", "terminal-help", "config", "list", "--config", configPath], { from: "node" });
+
+    expect(output).toContain("cd\tcd");
+    log.mockRestore();
+  });
 });

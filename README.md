@@ -61,6 +61,7 @@ terminal-help config path
 terminal-help config open
 terminal-help config reset
 terminal-help config validate
+  terminal-help config list
 terminal-help doctor
 ```
 
@@ -81,6 +82,8 @@ Search accepts multiple words, and the collection summary shows how many notes m
 Use the **Favorite** button to keep high-value commands at the top of the list. The favorite state is stored locally on this computer; **Favorites only** filters the list, and **Sort** can switch between favorites, title, and category order. Press `f` while browsing to toggle the selected command.
 
 Run `terminal-help config validate` in scripts or before sharing a notes file to confirm that the YAML is readable and report how many commands it contains.
+
+Run `terminal-help config list` to print every saved command id and title.
 
 ## Terminal controls
 
