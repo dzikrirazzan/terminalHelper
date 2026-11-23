@@ -655,6 +655,11 @@ code {
     border-radius: 10px 10px 0 0;
   }
 
+  .shortcut-list div {
+    grid-template-columns: minmax(96px, auto) 1fr;
+    gap: 10px;
+  }
+
   .form-grid label:nth-child(4),
   .form-grid label:nth-child(9) {
     grid-column: auto;
