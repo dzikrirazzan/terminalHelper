@@ -62,4 +62,18 @@ describe("CLI", () => {
     expect(output).toContain("cd\tcd");
     log.mockRestore();
   });
+
+  it("filters the command list by category", async () => {
+    let output = "";
+    const log = vi.spyOn(console, "log").mockImplementation((value) => {
+      output += `${String(value)}\n`;
+    });
+    const configPath = path.join(os.tmpdir(), "terminal-help-cli-category-notes.yaml");
+
+    await createProgram().parseAsync(["node", "terminal-help", "config", "list", "--category", "git", "--config", configPath], { from: "node" });
+
+    expect(output).toContain("git status");
+    expect(output).not.toContain("\tcd\n");
+    log.mockRestore();
+  });
 });

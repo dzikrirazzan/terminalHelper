@@ -12,6 +12,7 @@ import { launchWindow } from "./window.js";
 type RunTuiOptions = {
   config?: string;
   compact?: boolean;
+  category?: string;
 };
 
 function readConfigOption(options: RunTuiOptions, command?: Command): string | undefined {
@@ -112,9 +113,11 @@ export function createProgram(): Command {
     .command("list")
     .description("List command ids and titles from the notes YAML file.")
     .option("--config <path>", "Use a custom notes YAML file.")
+    .option("--category <category>", "Only list commands in this category.")
     .action(async (options: RunTuiOptions, command: Command) => {
       const result = await loadNotes(readConfigOption(options, command));
-      for (const note of result.notes.commands) {
+      const category = options.category as string | undefined;
+      for (const note of result.notes.commands.filter((item) => !category || item.category === category)) {
         console.log(`${note.id}\t${note.title}`);
       }
     });
