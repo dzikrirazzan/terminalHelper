@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { deleteCommand, upsertCommand } from "../core/mutations.js";
-import { filterCommands, getCategories } from "../core/search.js";
+import { filterCommands, getCategories, getSearchScore } from "../core/search.js";
 import type { CommandEntry, NotesDocument } from "../core/types.js";
 import { commandFromValues, formFields, valuesFromCommand, type FormMode, type FormValues } from "../tui/form.js";
 import { getTerminalHelpApi } from "./api.js";
@@ -85,7 +85,9 @@ export function App() {
     return [...matches].sort((left, right) => {
       if (sortMode === "title") return left.title.localeCompare(right.title);
       if (sortMode === "category") return `${left.category}-${left.title}`.localeCompare(`${right.category}-${right.title}`);
-      return Number(favorites.has(right.id)) - Number(favorites.has(left.id));
+      return getSearchScore(right, query) - getSearchScore(left, query)
+        || Number(favorites.has(right.id)) - Number(favorites.has(left.id))
+        || 0;
     });
   }, [category, favorites, favoritesOnly, notes.commands, query, sortMode]);
   const selectedCommand = filteredCommands.find((command) => command.id === selectedId) ?? filteredCommands[0];

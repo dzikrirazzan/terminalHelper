@@ -35,7 +35,7 @@ describe("renderer app", () => {
     expect(screen.getByText("matches")).toBeTruthy();
     fireEvent.change(screen.getByLabelText("Search commands"), { target: { value: "npm" } });
 
-    expect(screen.getByRole("button", { name: /npm install/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "npm install node" })).toBeTruthy();
     expect(screen.queryByRole("button", { name: /git status/i })).toBeNull();
     expect(screen.getByText("matches")).toBeTruthy();
   });
