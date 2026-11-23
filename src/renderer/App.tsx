@@ -55,6 +55,7 @@ export function App() {
   const [isBusy, setIsBusy] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [copiedCommand, setCopiedCommand] = useState("");
+  const [showShortcuts, setShowShortcuts] = useState(false);
 
   const load = async () => {
     setIsBusy(true);
@@ -258,6 +259,12 @@ export function App() {
         return;
       }
 
+      if (event.key === "?" && !isTyping) {
+        event.preventDefault();
+        setShowShortcuts((current) => !current);
+        return;
+      }
+
       if (form) {
         return;
       }
@@ -394,6 +401,9 @@ export function App() {
           </button>
           <button type="button" onClick={() => void reset()} disabled={isBusy}>
             Reset
+          </button>
+          <button type="button" onClick={() => setShowShortcuts(true)} aria-keyshortcuts="?">
+            Shortcuts <kbd>?</kbd>
           </button>
           <button type="button" onClick={clearFilters} disabled={!hasActiveFilters}>
             Clear filters
@@ -613,6 +623,22 @@ export function App() {
               <button type="submit" disabled={isBusy}>{isBusy ? "Saving..." : "Save"}</button>
             </div>
           </form>
+        </div>
+      ) : null}
+
+      {showShortcuts ? (
+        <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setShowShortcuts(false)}>
+          <section className="edit-modal shortcut-modal" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title">
+            <div className="modal-head">
+              <h2 id="shortcuts-title">Keyboard shortcuts</h2>
+              <button type="button" onClick={() => setShowShortcuts(false)} aria-label="Close shortcuts">Close</button>
+            </div>
+            <div className="shortcut-list">
+              {[["/ or Ctrl/Cmd+K", "Focus search"], ["↑/↓ or j/k", "Move selection"], ["a", "Add a note"], ["e", "Edit selection"], ["d", "Delete selection"], ["f", "Toggle favorite"], ["r", "Reload notes"], ["Esc", "Clear search or close"], ["?", "Show shortcuts"]].map(([key, label]) => (
+                <div key={key}><kbd>{key}</kbd><span>{label}</span></div>
+              ))}
+            </div>
+          </section>
         </div>
       ) : null}
     </main>
