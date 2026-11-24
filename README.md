@@ -86,6 +86,7 @@ Run `terminal-help config validate` in scripts or before sharing a notes file to
 
 Run `terminal-help config list` to print every saved command id and title.
 Add `--json` when another script needs the complete command entries as machine-readable output.
+Reset creates a `notes.yaml.backup` beside the config first, so your custom notes can be recovered if needed.
 
 ## Terminal controls
 

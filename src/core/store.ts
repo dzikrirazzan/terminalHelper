@@ -84,5 +84,11 @@ export async function saveNotes(notes: NotesDocument, configPath?: string): Prom
 }
 
 export async function resetNotes(configPath?: string): Promise<NotesStoreResult> {
-  return saveNotes(defaultNotes, configPath);
+  const resolvedPath = resolveConfigPath(configPath);
+
+  if (await fileExists(resolvedPath)) {
+    await fs.copyFile(resolvedPath, `${resolvedPath}.backup`);
+  }
+
+  return saveNotes(defaultNotes, resolvedPath);
 }

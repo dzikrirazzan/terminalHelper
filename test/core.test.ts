@@ -76,6 +76,7 @@ describe("notes store", () => {
     const reset = await resetNotes(configPath);
 
     expect(reset.notes.commands.length).toBe(defaultNotes.commands.length);
+    expect(await fs.readFile(`${configPath}.backup`, "utf8")).toContain("version: 1");
   });
 
   it("keeps custom notes and adds new built-in commands", async () => {
