@@ -61,7 +61,7 @@ terminal-help config path
 terminal-help config open
 terminal-help config reset
 terminal-help config validate
-  terminal-help config list
+terminal-help config list
 terminal-help config list --json
 terminal-help doctor
 ```
@@ -85,6 +85,7 @@ Use the **Favorite** button to keep high-value commands at the top of the list. 
 Run `terminal-help config validate` in scripts or before sharing a notes file to confirm that the YAML is readable and report how many commands it contains.
 
 Run `terminal-help config list` to print every saved command id and title.
+Category filters are case-insensitive, so `--category GIT` works the same as `--category git`.
 Add `--json` when another script needs the complete command entries as machine-readable output.
 Reset creates a `notes.yaml.backup` beside the config first, so your custom notes can be recovered if needed.
 
@@ -92,6 +93,7 @@ Reset creates a `notes.yaml.backup` beside the config first, so your custom note
 
 - `/`: search
 - `up/down` or `j/k`: move selection
+- `Home` / `End`: jump to the first or last command
 - `enter`: open command details
 - `a`: add command
 - `e`: edit selected command

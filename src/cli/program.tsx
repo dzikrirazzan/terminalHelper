@@ -119,7 +119,8 @@ export function createProgram(): Command {
     .action(async (options: RunTuiOptions, command: Command) => {
       const result = await loadNotes(readConfigOption(options, command));
       const category = options.category as string | undefined;
-      const commands = result.notes.commands.filter((item) => !category || item.category === category);
+      const normalizedCategory = category?.trim().toLowerCase();
+      const commands = result.notes.commands.filter((item) => !normalizedCategory || item.category.toLowerCase() === normalizedCategory);
 
       if (options.json) {
         console.log(JSON.stringify(commands));

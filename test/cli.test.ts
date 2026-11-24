@@ -89,4 +89,18 @@ describe("CLI", () => {
     expect(JSON.parse(output)).toEqual(expect.arrayContaining([expect.objectContaining({ id: "cd", title: "cd" })]));
     log.mockRestore();
   });
+
+  it("matches list categories without case sensitivity", async () => {
+    let output = "";
+    const log = vi.spyOn(console, "log").mockImplementation((value) => {
+      output += `${String(value)}\n`;
+    });
+    const configPath = path.join(os.tmpdir(), "terminal-help-cli-category-case-notes.yaml");
+
+    await createProgram().parseAsync(["node", "terminal-help", "config", "list", "--category", "GIT", "--config", configPath], { from: "node" });
+
+    expect(output).toContain("git status");
+    expect(output).not.toContain("\tcd\n");
+    log.mockRestore();
+  });
 });
