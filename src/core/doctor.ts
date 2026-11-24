@@ -13,13 +13,14 @@ export function hasCommand(command: string): boolean {
 
 export async function getDoctorReport(configPath?: string): Promise<DoctorReport> {
   const resolvedConfigPath = resolveConfigPath(configPath);
-  const configExists = await fileExists(resolvedConfigPath);
+  let configExists = await fileExists(resolvedConfigPath);
   let configValid = false;
   let error: string | undefined;
 
   try {
     await loadNotes(resolvedConfigPath);
     configValid = true;
+    configExists = true;
   } catch (caughtError) {
     error = caughtError instanceof Error ? caughtError.message : String(caughtError);
   }
