@@ -315,9 +315,13 @@ export function App() {
         return;
       }
 
-      if (!isTyping && filteredCommands.length > 0 && ["ArrowDown", "ArrowUp", "j", "k"].includes(event.key)) {
+      if (!isTyping && filteredCommands.length > 0 && ["ArrowDown", "ArrowUp", "j", "k", "Home", "End"].includes(event.key)) {
         event.preventDefault();
         const currentIndex = Math.max(0, filteredCommands.findIndex((command) => command.id === selectedId));
+        if (event.key === "Home" || event.key === "End") {
+          setSelectedId(filteredCommands[event.key === "Home" ? 0 : filteredCommands.length - 1].id);
+          return;
+        }
         const direction = event.key === "ArrowUp" || event.key === "k" ? -1 : 1;
         const nextIndex = (currentIndex + direction + filteredCommands.length) % filteredCommands.length;
         setSelectedId(filteredCommands[nextIndex].id);

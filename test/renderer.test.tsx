@@ -158,6 +158,21 @@ describe("renderer app", () => {
     expect(screen.queryByRole("dialog", { name: "Edit command" })).toBeNull();
   });
 
+  it("jumps to the first and last command with Home and End", async () => {
+    const notes = cloneNotes(defaultNotes);
+    Object.defineProperty(window, "terminalHelp", {
+      configurable: true,
+      value: { loadNotes: vi.fn(async () => ({ configPath: "/tmp/notes.yaml", notes })), saveNotes: vi.fn(), resetNotes: vi.fn(), openConfig: vi.fn() },
+    });
+
+    render(<App />);
+    await screen.findByText("Change the current working directory.");
+    fireEvent.keyDown(window, { key: "End" });
+    expect(screen.getByRole("button", { name: "git reset git" }).getAttribute("aria-current")).toBe("true");
+    fireEvent.keyDown(window, { key: "Home" });
+    expect(screen.getByRole("button", { name: "cd navigation" }).getAttribute("aria-current")).toBe("true");
+  });
+
   it("opens the add editor with the documented keyboard shortcut", async () => {
     const notes = cloneNotes(defaultNotes);
     Object.defineProperty(window, "terminalHelp", {
