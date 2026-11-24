@@ -35,6 +35,8 @@ export function getSearchScore(command: CommandEntry, query: string): number {
   const title = command.title.toLowerCase();
   const id = command.id.toLowerCase();
   const category = command.category.toLowerCase();
+  const normalizedTitleQuery = normalizedQuery.replace(/\s+/g, " ");
+  const phraseBonus = title === normalizedTitleQuery ? 150 : title.includes(normalizedTitleQuery) ? 40 : 0;
 
   return terms.reduce((score, term) => {
     if (id === term || title === term) return score + 100;
@@ -43,5 +45,5 @@ export function getSearchScore(command: CommandEntry, query: string): number {
     if (title.includes(term)) return score + 35;
     if (category.includes(term)) return score + 20;
     return score + 1;
-  }, 0);
+  }, phraseBonus);
 }

@@ -153,4 +153,11 @@ describe("command search", () => {
     expect(broad).toBeDefined();
     expect(getSearchScore(exact!, "git status")).toBeGreaterThan(getSearchScore(broad!, "git"));
   });
+
+  it("gives an exact multi-word title a phrase bonus", () => {
+    const command = defaultNotes.commands.find((item) => item.id === "npm-install");
+
+    expect(command).toBeDefined();
+    expect(getSearchScore(command!, "npm install")).toBeGreaterThan(getSearchScore(command!, "npm"));
+  });
 });
