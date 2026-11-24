@@ -13,6 +13,7 @@ type RunTuiOptions = {
   config?: string;
   compact?: boolean;
   category?: string;
+  json?: boolean;
 };
 
 function readConfigOption(options: RunTuiOptions, command?: Command): string | undefined {
@@ -114,10 +115,18 @@ export function createProgram(): Command {
     .description("List command ids and titles from the notes YAML file.")
     .option("--config <path>", "Use a custom notes YAML file.")
     .option("--category <category>", "Only list commands in this category.")
+    .option("--json", "Print commands as JSON.")
     .action(async (options: RunTuiOptions, command: Command) => {
       const result = await loadNotes(readConfigOption(options, command));
       const category = options.category as string | undefined;
-      for (const note of result.notes.commands.filter((item) => !category || item.category === category)) {
+      const commands = result.notes.commands.filter((item) => !category || item.category === category);
+
+      if (options.json) {
+        console.log(JSON.stringify(commands));
+        return;
+      }
+
+      for (const note of commands) {
         console.log(`${note.id}\t${note.title}`);
       }
     });

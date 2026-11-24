@@ -76,4 +76,17 @@ describe("CLI", () => {
     expect(output).not.toContain("\tcd\n");
     log.mockRestore();
   });
+
+  it("prints the command list as JSON", async () => {
+    let output = "";
+    const log = vi.spyOn(console, "log").mockImplementation((value) => {
+      output += String(value);
+    });
+    const configPath = path.join(os.tmpdir(), "terminal-help-cli-json-notes.yaml");
+
+    await createProgram().parseAsync(["node", "terminal-help", "config", "list", "--json", "--config", configPath], { from: "node" });
+
+    expect(JSON.parse(output)).toEqual(expect.arrayContaining([expect.objectContaining({ id: "cd", title: "cd" })]));
+    log.mockRestore();
+  });
 });

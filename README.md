@@ -62,6 +62,7 @@ terminal-help config open
 terminal-help config reset
 terminal-help config validate
   terminal-help config list
+terminal-help config list --json
 terminal-help doctor
 ```
 
@@ -84,6 +85,7 @@ Use the **Favorite** button to keep high-value commands at the top of the list. 
 Run `terminal-help config validate` in scripts or before sharing a notes file to confirm that the YAML is readable and report how many commands it contains.
 
 Run `terminal-help config list` to print every saved command id and title.
+Add `--json` when another script needs the complete command entries as machine-readable output.
 
 ## Terminal controls
 
